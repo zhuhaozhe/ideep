@@ -264,7 +264,8 @@ private:
     // make sure dst is big enough to hold the result 
     if (dst.is_empty())
       dst.init(pd.dst_desc());
-    auto expected_dst = dst.reorder_if_differ_in(pd.dst_desc());
+    tensor expected_dst(pd.dst_desc());
+    // auto expected_dst = dst.reorder_if_differ_in(pd.dst_desc());
     if (!dst_scales.empty() && utils::one_of(dst.get_data_type(), data_type::u8, data_type::s8)) {
       expected_dst.set_scale(dst_scales_in);
     }
