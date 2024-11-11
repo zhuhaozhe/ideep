@@ -1,6 +1,6 @@
 #ifndef IDEEP_OPERATORS_LSTM_HPP
 #define IDEEP_OPERATORS_LSTM_HPP
-
+#include <iostream>
 namespace ideep {
 
 struct lstm_forward_inference : public dnnl::lstm_forward {
@@ -51,7 +51,7 @@ struct lstm_forward_inference : public dnnl::lstm_forward {
 
     // Use user mode scratchpad
     op_attr.set_scratchpad_mode(dnnl::scratchpad_mode::user);
-
+std::cout << "hz-debug " << " ideep create desc " << std::endl;
     auto pd = primitive_desc(
         aengine,
         aprop,
@@ -66,13 +66,14 @@ struct lstm_forward_inference : public dnnl::lstm_forward {
         dst_iter_desc,
         dst_iter_c_desc,
         op_attr);
-
+std::cout << "hz-debug " << " ideep reorder " << std::endl;
     auto expected_weights_layer =
         weights_layer.reorder_if_differ_in(pd.weights_layer_desc(), op_attr);
     auto expected_weights_iter =
         weights_iter.reorder_if_differ_in(pd.weights_iter_desc(), op_attr);
+std::cout << "hz-debug " << " ideep malloc scratchpad  " << std::endl;
     tensor scratchpad(pd.scratchpad_desc());
-
+std::cout << "hz-debug " << " ideep execute p  " << std::endl;
     super(pd).execute(
         stream::default_stream(),
         {{DNNL_ARG_SRC_LAYER, src_layer},
@@ -85,6 +86,7 @@ struct lstm_forward_inference : public dnnl::lstm_forward {
          {DNNL_ARG_DST_ITER, dst_iter},
          {DNNL_ARG_DST_ITER_C, dst_iter_c},
          {DNNL_ARG_SCRATCHPAD, scratchpad}});
+std::cout << "hz-debug " << " ideep execute p done " << std::endl;
   }
 
   static std::tuple<tensor::desc, tensor::desc> expected_weights_desc(
